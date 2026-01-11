@@ -42,21 +42,23 @@ function SignUp() {
       name: form.name,
       email: form.email,
     });
-
+    resetForm();
+    setMsg("User is successfully registered");
+    navigate("/login");
+  };
+  const resetForm = () => {
     setForm({
       name: "",
       email: "",
       password: "",
       confirm: "",
     });
-    setMsg("User is successfully registered");
-    navigate("/login");
   };
   return (
     <>
       <div>
-        <h1>Welcome Back!!</h1>
-        <h3>You can Login Here...</h3>
+        <h1>Welcome to portal</h1>
+        <h3>You can register here...</h3>
         <form onSubmit={handleSubmit}>
           <label>
             Name:
@@ -65,7 +67,7 @@ function SignUp() {
               value={form.name}
               name="name"
               onChange={handleChange}
-              placeholder="Enter your name:"
+              placeholder="Enter your user-name:"
             />
           </label>
           <label>
@@ -99,7 +101,9 @@ function SignUp() {
             />
           </label>
           <button type="submit">Submit</button>
-          <button type="reset">Reset</button>
+          <button type="reset" onClick={resetForm}>
+            Reset
+          </button>
         </form>
         {msg && <p>{msg}</p>}
       </div>
