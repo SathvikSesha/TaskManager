@@ -4,11 +4,13 @@ import pool from "../config/db.js";
 export const createTask = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { task_name, start_date, end_date, priority, status } = req.body;
+    const { task_name, end_date, priority, status } = req.body;
 
     if (!task_name) {
       return res.status(400).json({ message: "Task name is required" });
     }
+
+    const start_date = new Date();
 
     const [result] = await pool.query(
       `INSERT INTO tasks 
@@ -17,7 +19,7 @@ export const createTask = async (req, res) => {
       [
         userId,
         task_name,
-        start_date || null,
+        start_date,
         end_date || null,
         priority || "Low",
         status || "Not Started",
@@ -29,7 +31,7 @@ export const createTask = async (req, res) => {
       taskId: result.insertId,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Create task error:", err);
     res.status(500).json({ message: "Failed to create task" });
   }
 };
