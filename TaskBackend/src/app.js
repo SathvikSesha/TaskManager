@@ -1,15 +1,19 @@
 import express from "express";
 import cors from "cors";
+import authRoutes from "./routes/auth.routes.js";
+import taskRoutes from "./routes/task.routes.js";
 
 const app = express();
 
-/* Middlewares */
 app.use(cors());
 app.use(express.json());
 
-/* Test route */
+app.use("/api/auth", authRoutes);
+
 app.get("/", (req, res) => {
   res.json({ message: "Backend is running 🚀" });
 });
+
+app.use("/api/tasks", taskRoutes);
 
 export default app;
