@@ -1,123 +1,9 @@
-// import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { useAuth } from "../Context/AuthContext";
-
-// function SignUp() {
-//   const { login } = useAuth();
-//   const [msg, setMsg] = useState("");
-//   const [form, setForm] = useState({
-//     name: "",
-//     email: "",
-//     password: "",
-//     confirm: "",
-//   });
-//   const navigate = useNavigate();
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setForm((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }));
-//   };
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     if (form.name.length < 4) {
-//       setMsg("Invalid Username!! Username must be atleast 4 characters!");
-//       return;
-//     }
-//     if (form.email === "") {
-//       setMsg("Email is Required!!!");
-//       return;
-//     }
-//     if (form.password.length < 6) {
-//       setMsg("Password must be atleast 6 characters!!");
-//       return;
-//     }
-//     if (form.password !== form.confirm) {
-//       setMsg("Passwords does match !!");
-//       return;
-//     }
-//     login({
-//       id: Date.now(),
-//       name: form.name,
-//       email: form.email,
-//     });
-//     resetForm();
-//     setMsg("User is successfully registered");
-//     navigate("/login");
-//   };
-//   const resetForm = () => {
-//     setForm({
-//       name: "",
-//       email: "",
-//       password: "",
-//       confirm: "",
-//     });
-//   };
-//   return (
-//     <>
-//       <div>
-//         <h1>Welcome to portal</h1>
-//         <h3>You can register here...</h3>
-//         <form onSubmit={handleSubmit}>
-//           <label>
-//             Name:
-//             <input
-//               type="text"
-//               value={form.name}
-//               name="name"
-//               onChange={handleChange}
-//               placeholder="Enter your name:"
-//             />
-//           </label>
-//           <label>
-//             Email:
-//             <input
-//               type="email"
-//               name="email"
-//               value={form.email}
-//               onChange={handleChange}
-//               placeholder="Enter your email:"
-//             />
-//           </label>
-//           <label>
-//             Password:
-//             <input
-//               type="password"
-//               value={form.password}
-//               name="password"
-//               onChange={handleChange}
-//               placeholder="Enter your password:"
-//             />
-//           </label>
-//           <label>
-//             Confirm Password:
-//             <input
-//               type="password"
-//               name="confirm"
-//               value={form.confirm}
-//               onChange={handleChange}
-//               placeholder="Re-enter your password:"
-//             />
-//           </label>
-//           <button type="submit">Submit</button>
-//           <button type="reset" onClick={resetForm}>
-//             Reset
-//           </button>
-//         </form>
-//         {msg && <p>{msg}</p>}
-//       </div>
-//     </>
-//   );
-// }
-// export default SignUp;
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../Context/AuthContext";
 import { motion } from "framer-motion";
+import api from "../api/axios";
 
 function SignUp() {
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [msg, setMsg] = useState("");
@@ -139,7 +25,7 @@ function SignUp() {
     setForm((p) => ({ ...p, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (form.name.length < 4)
@@ -152,14 +38,19 @@ function SignUp() {
 
     if (form.password !== form.confirm) return setMsg("Passwords do not match");
 
-    login({
-      id: Date.now(),
-      name: form.name,
-      email: form.email,
-      password: form.password,
-    });
+    try {
+      await api.post("/auth/signup", {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      });
 
-    navigate("/login");
+      setMsg("Account created successfully!");
+      navigate("/login");
+    } catch (err) {
+      console.log("Signup error:", err.response || err);
+      setMsg(err.response?.data?.message || "Registration failed");
+    }
   };
 
   return (

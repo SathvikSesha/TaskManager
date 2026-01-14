@@ -3,6 +3,7 @@ import { useAuth } from "../Context/AuthContext";
 import { motion } from "framer-motion";
 import HomeCard from "../Component/HomeCard";
 import AddTask from "../Component/AddTask";
+import api from "../api/axios";
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -10,10 +11,7 @@ function Dashboard() {
 
   const [activeTab, setActiveTab] = useState("home");
 
-  const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem(`tasks_${user.id}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [tasks, setTasks] = useState([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -24,63 +22,106 @@ function Dashboard() {
 
   const startEdit = (task) => {
     setEditingTask(task);
-    setForm(task);
+
+    setForm({
+      title: task.title || "",
+      endDate: task.endDate || "",
+      priority: task.priority || "Low",
+      status: task.status || "Not Started",
+    });
+
     setActiveTab("add");
   };
 
-  const updateTask = (e) => {
+  const updateTask = async (e) => {
     e.preventDefault();
 
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === editingTask.id ? { ...editingTask, ...form } : t
-      )
-    );
+    try {
+      await api.put(`/tasks/${editingTask.id}`, {
+        task_name: form.title,
+        end_date: form.endDate || null,
+        priority: form.priority,
+        status: form.status,
+      });
 
-    setEditingTask(null);
-    setForm({
-      title: "",
-      endDate: "",
-      priority: "Low",
-      status: "Not Started",
-    });
-    setActiveTab("tasks");
+      await fetchTasks();
+
+      setEditingTask(null);
+      setActiveTab("tasks");
+
+      setForm({
+        title: "",
+        endDate: "",
+        priority: "Low",
+        status: "Not Started",
+      });
+    } catch (err) {
+      console.error("Update task failed", err);
+    }
   };
 
-  /* Persist tasks */
   useEffect(() => {
-    localStorage.setItem(`tasks_${user.id}`, JSON.stringify(tasks));
-  }, [tasks, user.id]);
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const res = await api.get("/tasks");
+
+      // Map backend → frontend shape
+      const mappedTasks = res.data.map((t) => ({
+        id: t.id,
+        title: t.task_name,
+        endDate: t.end_date,
+        priority: t.priority,
+        status: t.status,
+      }));
+
+      setTasks(mappedTasks);
+    } catch (err) {
+      console.error("Failed to fetch tasks", err);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addTask = (e) => {
+  const addTask = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
 
-    setTasks((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        ...form,
-      },
-    ]);
+    try {
+      await api.post("/tasks", {
+        task_name: form.title,
+        end_date: form.endDate || null,
+        priority: form.priority,
+        status: form.status,
+      });
 
-    setForm({
-      title: "",
-      endDate: "",
-      priority: "Low",
-      status: "Not Started",
-    });
+      await fetchTasks();
 
-    setActiveTab("tasks");
+      setForm({
+        title: "",
+        endDate: "",
+        priority: "Low",
+        status: "Not Started",
+      });
+
+      setActiveTab("tasks");
+    } catch (err) {
+      console.error("Add task failed", err);
+    }
   };
 
-  const deleteTask = (id) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+  const deleteTask = async (id) => {
+    try {
+      await api.delete(`/tasks/${id}`);
+      await fetchTasks();
+    } catch (err) {
+      console.error("Delete task failed", err);
+    }
   };
 
   return (
