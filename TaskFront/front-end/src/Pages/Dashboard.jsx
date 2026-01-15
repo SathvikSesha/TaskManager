@@ -129,7 +129,7 @@ function Dashboard() {
     <div className="min-h-screen flex bg-gray-100 flex-col md:flex-row">
       {/* SIDEBAR */}
       <aside className="w-full md:w-[240px] bg-slate-900 text-white p-6 flex flex-col">
-        <h2 className="text-2xl font-bold mb-10">RoutineIQ</h2>
+        <h2 className="text-2xl font-bold mb-10">Task.ly</h2>
 
         <button
           onClick={() => setActiveTab("home")}

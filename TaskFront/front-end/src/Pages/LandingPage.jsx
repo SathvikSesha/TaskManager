@@ -12,7 +12,7 @@ function LandingPage() {
           transition={{ duration: 0.5, ease: "easeIn" }}
           className="text-xl md:text-2xl font-bold"
         >
-          RoutineIQ
+          Task.ly
         </motion.h2>
 
         <motion.div
@@ -93,7 +93,7 @@ function LandingPage() {
       {/* FOOTER */}
       <footer className="mt-auto bg-gray-100 py-10 px-5 md:px-10">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <h3 className="text-xl font-bold">RoutineIQ</h3>
+          <h3 className="text-xl font-bold">Task.ly</h3>
 
           <div className="flex gap-6 text-gray-600">
             <span>Privacy</span>

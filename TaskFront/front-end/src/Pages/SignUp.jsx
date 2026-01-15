@@ -69,7 +69,7 @@ function SignUp() {
           transition={{ duration: 0.5 }}
           className="text-xl md:text-2xl font-bold text-gray-900"
         >
-          RoutineIQ
+          Task.ly
         </motion.h2>
 
         <motion.div

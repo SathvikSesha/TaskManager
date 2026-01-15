@@ -52,7 +52,7 @@ function Login() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="text-xl md:text-2xl font-bold text-gray-900"
         >
-          RoutineIQ
+          Task.ly
         </motion.h2>
 
         <motion.div
