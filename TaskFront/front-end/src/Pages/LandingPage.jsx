@@ -24,7 +24,7 @@ function LandingPage() {
           <Link to="/" className="text-gray-600 hover:text-black">
             Home
           </Link>
-          <Link to="/about" className="text-gray-600 hover:text-black">
+          <Link to="/" className="text-gray-600 hover:text-black">
             About
           </Link>
           <Link
@@ -63,13 +63,13 @@ function LandingPage() {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="mt-10 flex gap-4"
         >
-          <motion.a
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold cursor-pointer"
           >
             <Link to="/signup">Get Started</Link>
-          </motion.a>
+          </motion.div>
 
           <motion.button
             whileHover={{ scale: 1.05 }}

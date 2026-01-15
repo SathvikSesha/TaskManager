@@ -152,7 +152,7 @@ function Login() {
             <button
               type="submit"
               className="w-full py-3 rounded-xl font-semibold text-white
-                       bg-blue-600 hover:bg-blue-500 transition-all"
+                       bg-blue-600 hover:bg-blue-800 transition-all cursor-pointer"
             >
               Login
             </button>

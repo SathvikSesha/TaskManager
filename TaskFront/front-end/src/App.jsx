@@ -1,18 +1,47 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+
 import Dashboard from "./Pages/Dashboard";
-import ProtectedRoutes from "./Routes/ProtectedRoutes";
 import Login from "./Pages/Login";
-import LandingPage from "./Pages/LandingPage";
 import SignUp from "./Pages/SignUp";
+import LandingPage from "./Pages/LandingPage";
+
+import ProtectedRoutes from "./Routes/ProtectedRoutes";
+import PublicRoute from "./Routes/PublicRoute";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      {/* LANDING */}
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        }
+      />
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
+      {/* LOGIN */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
 
+      {/* SIGNUP */}
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <SignUp />
+          </PublicRoute>
+        }
+      />
+
+      {/* DASHBOARD */}
       <Route
         path="/dashboard"
         element={

@@ -68,11 +68,12 @@ function Dashboard() {
     try {
       const res = await api.get("/tasks");
 
-      // Map backend → frontend shape
       const mappedTasks = res.data.map((t) => ({
         id: t.id,
         title: t.task_name,
-        endDate: t.end_date,
+        endDate: t.end_date
+          ? new Date(t.end_date).toISOString().split("T")[0]
+          : "",
         priority: t.priority,
         status: t.status,
       }));
@@ -125,43 +126,48 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-gray-100 flex-col md:flex-row">
       {/* SIDEBAR */}
-      <aside className="w-[15%] min-w-[200px] bg-slate-900 text-white p-6 flex flex-col">
+      <aside className="w-full md:w-[240px] bg-slate-900 text-white p-6 flex flex-col">
         <h2 className="text-2xl font-bold mb-10">RoutineIQ</h2>
 
         <button
           onClick={() => setActiveTab("home")}
-          className={`mb-4 text-left ${
-            activeTab === "home" ? "text-blue-400" : ""
-          }`}
+          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition
+    ${
+      activeTab === "home" ? "bg-slate-800 text-blue-400" : "hover:bg-slate-800"
+    }`}
         >
           Home
         </button>
 
         <button
           onClick={() => setActiveTab("add")}
-          className={`mb-4 text-left ${
-            activeTab === "add" ? "text-blue-400" : ""
-          }`}
+          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition
+    ${
+      activeTab === "add" ? "bg-slate-800 text-blue-400" : "hover:bg-slate-800"
+    }`}
         >
           Add Task
         </button>
 
         <button
           onClick={() => setActiveTab("tasks")}
-          className={`mb-4 text-left ${
-            activeTab === "tasks" ? "text-blue-400" : ""
-          }`}
+          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition
+    ${
+      activeTab === "tasks"
+        ? "bg-slate-800 text-blue-400"
+        : "hover:bg-slate-800"
+    }`}
         >
-          My Tasks
+          My tasks
         </button>
 
         <div className="mt-auto">
           <p className="mb-4 text-sm text-gray-300">Hello, {user.name}</p>
           <button
             onClick={logout}
-            className="bg-red-500 px-4 py-2 rounded-md w-full"
+            className="bg-red-500 px-4 py-2 rounded-md w-full cursor-pointer"
           >
             Logout
           </button>

@@ -180,7 +180,7 @@ function SignUp() {
               type="submit"
               className="md:col-span-2 w-full py-3 rounded-xl
                 font-semibold text-white bg-blue-600
-                hover:bg-blue-500 transition-all"
+                hover:bg-blue-500 transition-all cursor-pointer"
             >
               Sign Up
             </button>
@@ -198,7 +198,10 @@ function SignUp() {
 
           <p className="mt-6 text-center text-gray-600 text-sm">
             Already have an account?{" "}
-            <Link to="/login" className="text-blue-600 hover:underline">
+            <Link
+              to="/login"
+              className="text-blue-600 hover:underline cursor-pointer"
+            >
               Login
             </Link>
           </p>
