@@ -1,34 +1,26 @@
-import pool from "../config/db.js";
+import Task from "../models/task.model.js";
 
 /* CREATE TASK */
 export const createTask = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { task_name, end_date, priority, status } = req.body;
+    const { title, endDate, priority, status } = req.body;
 
-    if (!task_name) {
-      return res.status(400).json({ message: "Task name is required" });
+    if (!title) {
+      return res.status(400).json({ message: "Task title is required" });
     }
 
-    const start_date = new Date();
-
-    const [result] = await pool.query(
-      `INSERT INTO tasks 
-       (user_id, task_name, start_date, end_date, priority, status)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        userId,
-        task_name,
-        start_date,
-        end_date || null,
-        priority || "Low",
-        status || "Not Started",
-      ]
-    );
+    const task = await Task.create({
+      title,
+      endDate: endDate || null,
+      priority: priority || "Low",
+      status: status || "Not Started",
+      user: userId,
+    });
 
     res.status(201).json({
       message: "Task created successfully",
-      taskId: result.insertId,
+      taskId: task._id,
     });
   } catch (err) {
     console.error("Create task error:", err);
@@ -41,10 +33,9 @@ export const getTasks = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const [tasks] = await pool.query(
-      "SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC",
-      [userId]
-    );
+    const tasks = await Task.find({ user: userId }).sort({
+      createdAt: -1,
+    });
 
     res.json(tasks);
   } catch (err) {
@@ -53,47 +44,29 @@ export const getTasks = async (req, res) => {
   }
 };
 
+/* UPDATE TASK */
 export const updateTask = async (req, res) => {
   try {
     const userId = req.user.id;
     const taskId = req.params.id;
 
-    // 1️⃣ Get existing task
-    const [rows] = await pool.query(
-      "SELECT * FROM tasks WHERE id = ? AND user_id = ?",
-      [taskId, userId]
-    );
+    // 1️⃣ Find task
+    const task = await Task.findOne({
+      _id: taskId,
+      user: userId,
+    });
 
-    if (rows.length === 0) {
+    if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    const existingTask = rows[0];
+    // 2️⃣ Update fields (only if provided)
+    task.title = req.body.title ?? task.title;
+    task.endDate = req.body.endDate ?? task.endDate;
+    task.priority = req.body.priority ?? task.priority;
+    task.status = req.body.status ?? task.status;
 
-    // 2️⃣ Merge old + new values
-    const updatedTask = {
-      task_name: req.body.task_name ?? existingTask.task_name,
-      start_date: req.body.start_date ?? existingTask.start_date,
-      end_date: req.body.end_date ?? existingTask.end_date,
-      priority: req.body.priority ?? existingTask.priority,
-      status: req.body.status ?? existingTask.status,
-    };
-
-    // 3️⃣ Update safely
-    await pool.query(
-      `UPDATE tasks
-       SET task_name = ?, start_date = ?, end_date = ?, priority = ?, status = ?
-       WHERE id = ? AND user_id = ?`,
-      [
-        updatedTask.task_name,
-        updatedTask.start_date,
-        updatedTask.end_date,
-        updatedTask.priority,
-        updatedTask.status,
-        taskId,
-        userId,
-      ]
-    );
+    await task.save();
 
     res.json({ message: "Task updated successfully" });
   } catch (err) {
@@ -108,12 +81,12 @@ export const deleteTask = async (req, res) => {
     const userId = req.user.id;
     const taskId = req.params.id;
 
-    const [result] = await pool.query(
-      "DELETE FROM tasks WHERE id=? AND user_id=?",
-      [taskId, userId]
-    );
+    const task = await Task.findOneAndDelete({
+      _id: taskId,
+      user: userId,
+    });
 
-    if (result.affectedRows === 0) {
+    if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
