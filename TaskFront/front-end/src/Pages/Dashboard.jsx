@@ -7,10 +7,9 @@ import api from "../api/axios";
 
 function Dashboard() {
   const { user, logout } = useAuth();
+
   const [editingTask, setEditingTask] = useState(null);
-
   const [activeTab, setActiveTab] = useState("home");
-
   const [tasks, setTasks] = useState([]);
 
   const [form, setForm] = useState({
@@ -20,6 +19,7 @@ function Dashboard() {
     status: "Not Started",
   });
 
+  // 🔹 Start Editing
   const startEdit = (task) => {
     setEditingTask(task);
 
@@ -33,13 +33,14 @@ function Dashboard() {
     setActiveTab("add");
   };
 
+  // 🔹 Update Task (PATCH)
   const updateTask = async (e) => {
     e.preventDefault();
 
     try {
-      await api.put(`/tasks/${editingTask.id}`, {
-        task_name: form.title,
-        end_date: form.endDate || null,
+      await api.patch(`/tasks/${editingTask.id}`, {
+        title: form.title,
+        endDate: form.endDate || null,
         priority: form.priority,
         status: form.status,
       });
@@ -60,6 +61,7 @@ function Dashboard() {
     }
   };
 
+  // 🔹 Fetch Tasks
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -69,10 +71,10 @@ function Dashboard() {
       const res = await api.get("/tasks");
 
       const mappedTasks = res.data.map((t) => ({
-        id: t.id,
-        title: t.task_name,
-        endDate: t.end_date
-          ? new Date(t.end_date).toISOString().split("T")[0]
+        id: t._id,
+        title: t.title,
+        endDate: t.endDate
+          ? new Date(t.endDate).toISOString().split("T")[0]
           : "",
         priority: t.priority,
         status: t.status,
@@ -84,19 +86,21 @@ function Dashboard() {
     }
   };
 
+  // 🔹 Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 🔹 Add Task
   const addTask = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
 
     try {
       await api.post("/tasks", {
-        task_name: form.title,
-        end_date: form.endDate || null,
+        title: form.title,
+        endDate: form.endDate || null,
         priority: form.priority,
         status: form.status,
       });
@@ -116,6 +120,7 @@ function Dashboard() {
     }
   };
 
+  // 🔹 Delete Task
   const deleteTask = async (id) => {
     try {
       await api.delete(`/tasks/${id}`);
@@ -127,42 +132,40 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-gray-100 flex-col md:flex-row">
-      {/* SIDEBAR */}
+      {/* SIDEBAR */}{" "}
       <aside className="w-full md:w-[240px] bg-slate-900 text-white p-6 flex flex-col">
+        {" "}
         <h2 className="text-2xl font-bold mb-10">Task.ly</h2>
-
         <button
           onClick={() => setActiveTab("home")}
-          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition
-    ${
-      activeTab === "home" ? "bg-slate-800 text-blue-400" : "hover:bg-slate-800"
-    }`}
+          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition ${
+            activeTab === "home"
+              ? "bg-slate-800 text-blue-400"
+              : "hover:bg-slate-800"
+          }`}
         >
           Home
         </button>
-
         <button
           onClick={() => setActiveTab("add")}
-          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition
-    ${
-      activeTab === "add" ? "bg-slate-800 text-blue-400" : "hover:bg-slate-800"
-    }`}
+          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition ${
+            activeTab === "add"
+              ? "bg-slate-800 text-blue-400"
+              : "hover:bg-slate-800"
+          }`}
         >
           Add Task
         </button>
-
         <button
           onClick={() => setActiveTab("tasks")}
-          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition
-    ${
-      activeTab === "tasks"
-        ? "bg-slate-800 text-blue-400"
-        : "hover:bg-slate-800"
-    }`}
+          className={`mb-4 text-left cursor-pointer px-3 py-2 rounded-md transition ${
+            activeTab === "tasks"
+              ? "bg-slate-800 text-blue-400"
+              : "hover:bg-slate-800"
+          }`}
         >
           My tasks
         </button>
-
         <div className="mt-auto">
           <p className="mb-4 text-sm text-gray-300">Hello, {user.name}</p>
           <button
@@ -173,8 +176,7 @@ function Dashboard() {
           </button>
         </div>
       </aside>
-
-      {/* MAIN SECTION */}
+      {/* MAIN */}
       <main className="flex-1 p-10">
         {activeTab === "home" && (
           <motion.div
@@ -191,7 +193,6 @@ function Dashboard() {
               </p>
             </div>
 
-            {/* HOME CARDS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <HomeCard
                 title="Add New Task"
@@ -216,6 +217,7 @@ function Dashboard() {
             </div>
           </motion.div>
         )}
+
         {activeTab === "add" && (
           <AddTask
             form={form}
@@ -257,8 +259,8 @@ function Dashboard() {
                           task.status === "Completed"
                             ? "bg-green-100 text-green-700"
                             : task.status === "In Progress"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-100 text-gray-600"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-gray-100 text-gray-600"
                         }`}
                       >
                         {task.status}
@@ -272,8 +274,8 @@ function Dashboard() {
                           task.priority === "High"
                             ? "text-red-500"
                             : task.priority === "Medium"
-                            ? "text-yellow-600"
-                            : "text-green-600"
+                              ? "text-yellow-600"
+                              : "text-green-600"
                         }`}
                       >
                         {task.priority}

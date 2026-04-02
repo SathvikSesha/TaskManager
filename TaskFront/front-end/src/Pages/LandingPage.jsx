@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 function LandingPage() {
@@ -96,9 +96,9 @@ function LandingPage() {
           <h3 className="text-xl font-bold">Task.ly</h3>
 
           <div className="flex gap-6 text-gray-600">
-            <span>Privacy</span>
-            <span>Terms</span>
-            <span>Contact</span>
+            <span className="hover:text-blue-600 cursor-pointer">Privacy</span>
+            <span className="hover:text-blue-600 cursor-pointer">Terms</span>
+            <span className="hover:text-blue-600 cursor-pointer">Contact</span>
           </div>
 
           <p className="text-sm text-gray-500">
@@ -111,32 +111,59 @@ function LandingPage() {
 }
 
 function StatusCard({ title, color, index }) {
+  const navigate = useNavigate(); // <-- Initialize the navigation hook
+
   const colors = {
-    green: "bg-green-100 text-green-700",
-    yellow: "bg-yellow-100 text-yellow-700",
-    blue: "bg-blue-100 text-blue-700",
-    red: "bg-red-100 text-red-700",
-    purple: "bg-purple-100",
+    green: "bg-green-100 text-green-700 ring-green-200",
+    yellow: "bg-yellow-100 text-yellow-700 ring-yellow-200",
+    blue: "bg-blue-100 text-blue-700 ring-blue-200",
+    red: "bg-red-100 text-red-700 ring-red-200",
+    purple: "bg-purple-100 text-purple-700 ring-purple-200",
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.15, duration: 0.5 }}
-      whileHover={{
-        scale: 1.05,
-        boxShadow: "0px 10px 30px rgba(0,0,0,0.12)",
-      }}
-      className="w-64 bg-white shadow-md rounded-xl p-4 flex items-center justify-between cursor-pointer"
+      transition={{ delay: index * 0.25, duration: 0.6, ease: "easeOut" }}
     >
-      <span className={`px-3 py-1 rounded-full text-sm ${colors[color]}`}>
-        {title}
-      </span>
-      <div className="flex items-center gap-3 text-gray-400 text-xl">
-        <span>+</span>
-        <span>⋯</span>
-      </div>
+      <motion.div
+        onClick={() => navigate("/login")} // <-- Add onClick handler here
+        animate={{ y: [0, -8, 0] }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: index * 0.2,
+        }}
+        whileHover={{
+          scale: 1.05,
+          y: -5,
+        }}
+        className="w-64 bg-white/80 backdrop-blur-md border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] rounded-2xl p-5 flex items-center justify-between cursor-pointer transition-shadow duration-300"
+      >
+        <span
+          className={`px-4 py-1.5 rounded-full text-sm font-medium ring-1 ring-inset ${colors[color]}`}
+        >
+          {title}
+        </span>
+        <div className="flex items-center gap-2 text-gray-400 text-lg">
+          <motion.button
+            onClick={(e) => e.stopPropagation()}
+            whileHover={{ scale: 1.2, color: "#1f2937" }}
+            className="transition-colors"
+          >
+            +
+          </motion.button>
+          <motion.button
+            onClick={(e) => e.stopPropagation()}
+            whileHover={{ scale: 1.2, color: "#1f2937" }}
+            className="transition-colors pb-1"
+          >
+            ⋯
+          </motion.button>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
