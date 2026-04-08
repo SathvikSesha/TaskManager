@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Dashboard from "./Pages/Dashboard";
 import Login from "./Pages/Login";
 import SignUp from "./Pages/SignUp";
+import AuthStatus from "./Pages/AuthStatus";
 import LandingPage from "./Pages/LandingPage";
 
 import ProtectedRoutes from "./Routes/ProtectedRoutes";
@@ -39,6 +40,11 @@ function App() {
             <SignUp />
           </PublicRoute>
         }
+      />
+
+      <Route
+        path="/auth/status"
+        element={<AuthStatus />}
       />
 
       {/* DASHBOARD */}
