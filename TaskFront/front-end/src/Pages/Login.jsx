@@ -11,7 +11,7 @@ function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
 
   const [msg, setMsg] = useState("");
-  const [msgType, setMsgType] = useState(""); // "error" | "success"
+  const [msgType, setMsgType] = useState("");
 
   useEffect(() => {
     if (!msg) return;
@@ -43,14 +43,10 @@ function Login() {
 
     try {
       const res = await api.post("/auth/login", form);
-
-      // Authenticate user in context
       login(res.data.user, res.data.token);
 
       setMsg("Login successful! Redirecting...");
       setMsgType("success");
-
-      // 1-second laziness before navigating to dashboard
       setTimeout(() => {
         navigate("/dashboard");
       }, 1000);
@@ -58,6 +54,15 @@ function Login() {
       showError(err.response?.data?.message || "Login failed");
     } finally {
       if (msgType !== "success") setLoading(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    try {
+      const res = await api.get("/auth/google/url");
+      window.location.href = res.data.url;
+    } catch (err) {
+      showError("Failed to connect to Google Auth");
     }
   };
 
@@ -205,11 +210,13 @@ function Login() {
             </div>
 
             <motion.button
+              onClick={handleGoogleAuth}
+              type="button"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.97 }}
               className="w-full mt-5 py-2.5 px-4 rounded-xl text-sm font-medium text-gray-700
               bg-white border border-gray-200/80 hover:bg-gray-50 hover:shadow-sm
-              transition-all flex items-center justify-center gap-2.5"
+              transition-all flex items-center justify-center gap-2.5 cursor-pointer"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path

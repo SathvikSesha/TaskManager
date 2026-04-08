@@ -70,6 +70,17 @@ function SignUp() {
     }
   };
 
+  const handleGoogleAuth = async () => {
+    try {
+      // Assuming your Axios instance is configured correctly,
+      // otherwise use standard fetch('http://localhost:8080/auth/google/url')
+      const res = await api.get("/auth/google/url");
+      window.location.href = res.data.url;
+    } catch (err) {
+      showError("Failed to connect to Google Auth");
+    }
+  };
+
   return (
     <div
       className="min-h-screen relative overflow-hidden
@@ -238,11 +249,13 @@ function SignUp() {
             </div>
 
             <motion.button
+              onClick={handleGoogleAuth} // <-- Add this!
+              type="button"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.97 }}
               className="w-full mt-5 py-2.5 px-4 rounded-xl text-sm font-medium text-gray-700
               bg-white border border-gray-200/80 hover:bg-gray-50 hover:shadow-sm
-              transition-all flex items-center justify-center gap-2.5"
+              transition-all flex items-center justify-center gap-2.5 cursor-pointer"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
