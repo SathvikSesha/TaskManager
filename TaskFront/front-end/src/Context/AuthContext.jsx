@@ -1,4 +1,10 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useCallback,
+} from "react";
 
 const AuthContext = createContext(null);
 
@@ -6,7 +12,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔁 Restore user on reload
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
@@ -18,17 +23,17 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  const login = (data, token) => {
+  const login = useCallback((data, token) => {
     setUser(data);
     localStorage.setItem("user", JSON.stringify(data));
     localStorage.setItem("token", token);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
