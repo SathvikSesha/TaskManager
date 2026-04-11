@@ -22,7 +22,7 @@ const taskSchema = new mongoose.Schema(
       enum: ["Not Started", "In Progress", "Completed"],
       default: "Not Started",
     },
-    
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -31,5 +31,6 @@ const taskSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+taskSchema.index({ user: 1, createdAt: -1 });
 
 export default mongoose.model("Task", taskSchema);

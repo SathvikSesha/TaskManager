@@ -1,42 +1,34 @@
-import {
-  useState,
-  useEffect,
-  createContext,
-  useContext,
-  useCallback,
-} from "react";
+import { useState, createContext, useContext, useCallback } from "react";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    const savedUser = sessionStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const loading = false;
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-
-    if (savedUser && token) {
-      setUser(JSON.parse(savedUser));
-    }
-
-    setLoading(false);
+  const login = useCallback((data) => {
+    setUser(data);
+    sessionStorage.setItem("user", JSON.stringify(data));
   }, []);
 
-  const login = useCallback((data, token) => {
-    setUser(data);
-    localStorage.setItem("user", JSON.stringify(data));
-    localStorage.setItem("token", token);
+  const updateUser = useCallback((partial) => {
+    setUser((prev) => {
+      const next = { ...(prev || {}), ...(partial || {}) };
+      sessionStorage.setItem("user", JSON.stringify(next));
+      return next;
+    });
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("user");
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, updateUser, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

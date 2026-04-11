@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"; // ✅ Import useState
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { motion } from "framer-motion";
@@ -11,31 +11,30 @@ export default function AuthStatus() {
   const [hasLoggedIn, setHasLoggedIn] = useState(false);
 
   const error = searchParams.get("error");
-  const token = searchParams.get("token");
   const name = searchParams.get("name");
   const email = searchParams.get("email");
+  const tier = searchParams.get("tier");
+  const taskLimitRaw = searchParams.get("taskLimit");
+  const taskLimit = taskLimitRaw ? Number(taskLimitRaw) : undefined;
 
-  const status = error
-    ? "failed"
-    : token && name && email
-      ? "success"
-      : "processing";
+  const status = error ? "failed" : name && email ? "success" : "processing";
 
-  // EFFECT 1: Handle saving the data exactly ONE time
   useEffect(() => {
-    if (token && name && email && !hasLoggedIn) {
+    if (name && email && !hasLoggedIn) {
       setHasLoggedIn(true); // Lock it
-      const userData = { name, email };
-      login(userData, token); // Save globally
+      const userData = {
+        name,
+        email,
+        ...(tier ? { tier } : {}),
+        ...(Number.isFinite(taskLimit) ? { taskLimit } : {}),
+      };
+      login(userData);
     }
-
-    // Fallback if URL is missing data
-    if (!error && (!token || !name || !email)) {
+    if (!error && (!name || !email)) {
       navigate("/login");
     }
-  }, [login, error, token, name, email, hasLoggedIn, navigate]);
+  }, [login, error, name, email, tier, taskLimit, hasLoggedIn, navigate]);
 
-  // EFFECT 2: Handle the Redirect Timers safely
   useEffect(() => {
     if (error) {
       const t = setTimeout(() => navigate("/login"), 2500);
@@ -43,7 +42,6 @@ export default function AuthStatus() {
     }
 
     if (hasLoggedIn) {
-      // Because this is in its own effect, the timer won't get cancelled!
       const t = setTimeout(() => navigate("/dashboard"), 1500);
       return () => clearTimeout(t);
     }

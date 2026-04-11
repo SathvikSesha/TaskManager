@@ -6,11 +6,14 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -25,12 +28,22 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+
+    subscriptionTier: {
+      type: String,
+      enum: ["free", "plus", "pro"],
+      default: "free",
+    },
+    taskLimit: {
+      type: Number,
+      default: 10,
+    },
   },
   { timestamps: true },
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password") || !this.password) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password") || !this.password) return;
 
   this.password = await bcrypt.hash(this.password, 10);
 });

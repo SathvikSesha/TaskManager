@@ -42,10 +42,7 @@ function App() {
         }
       />
 
-      <Route
-        path="/auth/status"
-        element={<AuthStatus />}
-      />
+      <Route path="/auth/status" element={<AuthStatus />} />
 
       {/* DASHBOARD */}
       <Route

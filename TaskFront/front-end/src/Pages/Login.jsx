@@ -43,7 +43,7 @@ function Login() {
 
     try {
       const res = await api.post("/auth/login", form);
-      login(res.data.user, res.data.token);
+      login(res.data.user);
 
       setMsg("Login successful! Redirecting...");
       setMsgType("success");
