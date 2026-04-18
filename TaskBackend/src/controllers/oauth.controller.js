@@ -1,3 +1,3 @@
-exports.loginWithProvider = (req, res) => {
-  res.json({ message: 'OAuth login successful' });
+export const loginWithProvider = (req, res) => {
+  res.json({ message: "OAuth login successful" });
 };
