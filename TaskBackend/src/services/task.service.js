@@ -1,6 +1,7 @@
 import Task from "../models/task.model.js";
 import User from "../models/user.model.js";
 import { redisClient } from "../config/redis.js";
+import { encryptText, decryptText } from "../utils/encryption.util.js";
 
 class TaskService {
   async createTask(userId, taskData) {
@@ -29,7 +30,7 @@ class TaskService {
     }
 
     const task = await Task.create({
-      title: taskData.title,
+      title: encryptText(taskData.title),
       endDate: taskData.endDate || null,
       priority: taskData.priority || "Low",
       status: taskData.status || "Not Started",
@@ -55,11 +56,17 @@ class TaskService {
     console.log("Serving from MongoDB");
     const tasks = await Task.find({ user: userId }).sort({ createdAt: -1 });
 
+    const decryptedTasks = tasks.map((task) => {
+      const taskObj = task.toObject();
+      taskObj.title = decryptText(taskObj.title);
+      return taskObj;
+    });
+
     if (redisClient) {
-      await redisClient.setEx(cacheKey, 3600, JSON.stringify(tasks));
+      await redisClient.setEx(cacheKey, 3600, JSON.stringify(decryptedTasks));
     }
 
-    return tasks;
+    return decryptedTasks;
   }
 
   async updateTask(userId, taskId, updateData) {

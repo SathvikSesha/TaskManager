@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  res.json({ message: "Backend is running 🚀" });
+  res.json({ message: "Backend is running..." });
 });
 
 const globalLimiter = rateLimit({
