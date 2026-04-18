@@ -1,6 +1,8 @@
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
+import { redisClient } from "../config/redis.js";
+import { sendOTPEmail } from "../utils/email.util.js";
 
 class AuthService {
   #getGoogleConfig() {
@@ -22,6 +24,10 @@ class AuthService {
       { id: user._id, email: user.email },
       process.env.JWT_SECRET,
     );
+  }
+
+  #generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
   async signup(name, email, password) {
@@ -72,6 +78,49 @@ class AuthService {
     if (!isMatch) {
       const error = new Error("Invalid credentials");
       error.statusCode = 401;
+      throw error;
+    }
+
+    const otp = this.#generateOTP();
+
+    if (!redisClient) {
+      const error = new Error("Server configuration error: Cache unavailable.");
+      error.statusCode = 500;
+      throw error;
+    }
+
+    await redisClient.setEx(`otp:${user.email}`, 300, otp);
+
+    await sendOTPEmail(user.email, otp);
+
+    return {
+      mfaRequired: true,
+      email: user.email,
+      message: "An OTP has been sent to your email.",
+    };
+  }
+
+  async verifyOTP(email, otp) {
+    if (!email || !otp) {
+      const error = new Error("Email and OTP are required");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const cachedOtp = await redisClient.get(`otp:${email}`);
+
+    if (!cachedOtp || cachedOtp !== otp) {
+      const error = new Error("Invalid or expired OTP");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    await redisClient.del(`otp:${email}`);
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error = new Error("User not found");
+      error.statusCode = 404;
       throw error;
     }
 

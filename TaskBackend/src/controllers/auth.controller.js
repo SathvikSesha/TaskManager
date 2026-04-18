@@ -26,8 +26,20 @@ export const signup = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const { user, token } = await authService.login(email, password);
 
+    const result = await authService.login(email, password);
+
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const verifyOTP = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+
+    const { user, token } = await authService.verifyOTP(email, otp);
     setTokenCookie(res, token);
 
     res.json({
