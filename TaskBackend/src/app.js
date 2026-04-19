@@ -7,11 +7,23 @@ import taskRoutes from "./routes/task.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 
-const app = express();
+const allowedOrigins = [
+  "http://localhost:5173", 
+  "https://taskly-topaz-sigma.vercel.app" 
+];
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://taskly-topaz-sigma.vercel.app"],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        var msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   }),
 );
