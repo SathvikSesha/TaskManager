@@ -9,7 +9,6 @@ import { errorHandler } from "./middleware/error.middleware.js";
 
 const app = express();
 
-// 2. NOW apply CORS
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://taskly-topaz-sigma.vercel.app"],
