@@ -9,14 +9,17 @@ import { errorHandler } from "./middleware/error.middleware.js";
 
 const app = express();
 
-cors({
-  origin: [
-    "http://localhost:5173",
-    "https://taskly-topaz-sigma.vercel.app"
-  ],
+app.set("trust proxy", 1);
+
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://taskly-topaz-sigma.vercel.app"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
-})
+};
+
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
