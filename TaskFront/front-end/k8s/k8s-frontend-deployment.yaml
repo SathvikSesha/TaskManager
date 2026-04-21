@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taskly-frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taskly-frontend
+  template:
+    metadata:
+      labels:
+        app: taskly-frontend
+    spec:
+      containers:
+        - name: taskly-frontend
+          image: seshasathvik/taskly-frontend:v3
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
