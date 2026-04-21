@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: taskly-backend
-          image: taskly-backend
-          imagePullPolicy: Never
+          image: seshasathvik/taskly-backend:v11
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           envFrom:
